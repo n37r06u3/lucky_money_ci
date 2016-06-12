@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50505
 File Encoding         : 65001
 
-Date: 2016-06-08 17:36:21
+Date: 2016-06-12 17:49:18
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -24,16 +24,18 @@ CREATE TABLE `lucky_money` (
   `total_amount` float NOT NULL,
   `quantity` int(255) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Table structure for lucky_money_quota
+-- Table structure for lucky_money_package
 -- ----------------------------
-DROP TABLE IF EXISTS `lucky_money_quota`;
-CREATE TABLE `lucky_money_quota` (
+DROP TABLE IF EXISTS `lucky_money_package`;
+CREATE TABLE `lucky_money_package` (
   `lucky_money_id` int(11) NOT NULL,
-  `amount` float NOT NULL,
-  `is_used` tinyint(1) DEFAULT NULL COMMENT '是否领取',
+  `amount` decimal(10,2) NOT NULL,
+  `uid` int(11) DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`id`),
   KEY `lucky_money_fk` (`lucky_money_id`),
   CONSTRAINT `lucky_money_fk` FOREIGN KEY (`lucky_money_id`) REFERENCES `lucky_money` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=92 DEFAULT CHARSET=utf8;
