@@ -2,69 +2,75 @@
 
 class Lucky_Money extends CI_Controller {
 
-	/**
-	 * Index Page for this controller.
-	 *
-	 * Maps to the following URL
-	 * 		http://example.com/index.php/welcome
-	 *	- or -  
-	 * 		http://example.com/index.php/welcome/index
-	 *	- or -
-	 * Since this controller is set as the default controller in 
-	 * config/routes.php, it's displayed at http://example.com/
-	 *
-	 * So any other public methods not prefixed with an underscore will
-	 * map to /index.php/welcome/<method_name>
-	 * @see http://codeigniter.com/user_guide/general/urls.html
-	 */
-
-
     /**
      *红包列表
      */
 	public function index()
 	{
-		$this->load->model('lucky_money_model');
+		$this->load->model('LuckyMoney');
 		$data['title'] = "红包";
-		$data['lucky_money'] = $this->lucky_money_model->getAllLuckyMoney();
+		$data['all_lucky_money'] = $this->LuckyMoney->find();
 
-		$this->load->view('lucky_money', $data);
+		$this->load->view('lucky_money/list', $data);
 	}
     /**
      *添加红包
      */
     public function add()
     {
-        $this->load->model('lucky_money_model');
-        $data['title'] = "红包";
-        $data['lucky_money'] = $this->lucky_money_model->getAllLuckyMoney();
-
-        $this->load->view('lucky_money', $data);
+        $data['total_amount'] = $_POST['total_amount'];
+        $data['quantity'] = $_POST['quantity'];
+        $data2= $_POST['one_amount'];
+          $this->db->insert('lucky_money', $data);
+        redirect('lucky_money/index');
     }
 
     /**
-     *生成红包分配
+     *查看红包
      */
-    public function generate_all()
+    public function show($id=null)
     {
-        $this->load->model('lucky_money_model');
-        $data['title'] = "生成红包";
-        $data['lucky_money'] = $this->lucky_money_model->getAllLuckyMoney();
-
-        $this->load->view('lucky_money', $data);
+        $this->load->model('LuckyMoney');
+        $this->load->model('LuckyMoneyPackage');
+        $data['title'] = "查看红包";
+        $data['lucky_money'] = $this->LuckyMoney->find_by_id($id);
+        $data['lucky_money_package'] = $this->LuckyMoneyPackage->find_by_fk($id);
+        $data['lucky_money_package_count'] = $this->LuckyMoneyPackage->count($id);
+        $data['lucky_money_package_count_amount'] = $this->LuckyMoneyPackage->count_amount($id);
+        $this->load->view('lucky_money/single', $data);
     }
     /**
-     *生成单个红包分配
+     *领取红包
      */
-    public function generate_one()
+    public function receive($id=null)
     {
-        $this->load->model('lucky_money_model');
-        $data['title'] = "生成红包";
-        $data['lucky_money'] = $this->lucky_money_model->getAllLuckyMoney();
+        $this->load->model('LuckyMoney');
+        $this->load->model('LuckyMoneyPackage');
+        $lucky_money= $this->LuckyMoney->find_by_id($id);
 
-        $this->load->view('lucky_money', $data);
+        $lucky_money_package_count = $this->LuckyMoneyPackage->count($id);
+        $lucky_money_package_count_amount = $this->LuckyMoneyPackage->count_amount($id);
+
+        $total=$lucky_money->total_amount - $lucky_money_package_count_amount;  //余额
+        $num=$lucky_money->quantity - $lucky_money_package_count;  //剩余次数
+        $min=0.01;
+
+        if ($num>1){
+            $safe_total=($total-($num)*$min)/($num);
+            $money=mt_rand($min*100,$safe_total*100)/100;
+            $data['lucky_money_id']= $id;
+            $data['amount']= $money;
+            $data['uid']=1 ;
+            $this->db->insert('lucky_money_package', $data);
+        } elseif ($num ==1){
+            $money=$total;
+            $data['lucky_money_id']= $id;
+            $data['amount']= $money;
+            $data['uid']=1 ;
+            $this->db->insert('lucky_money_package', $data);
+        }
+
+        redirect('lucky_money/show/'.$id);
     }
 }
 
-/* End of file welcome.php */
-/* Location: ./application/controllers/welcome.php */

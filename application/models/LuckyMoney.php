@@ -7,16 +7,12 @@
  */
 
 
-class Lucky_money_model extends  CI_Model{
+class LuckyMoney extends  CI_Model{
     function  __construct()
     {
         parent::__construct();
     }
 
-
-    /**
-     *
-     */
     function  getAllLuckyMoney(){
         
         $query = $this->db->query("SELECT * FROM lucky_money");
@@ -27,5 +23,14 @@ class Lucky_money_model extends  CI_Model{
         }
     }
 
+    function find_by_id($id){
+       return $this -> db -> where('id' , $id) -> limit(1)->get('lucky_money')->row();
+    }
 
+    function  find(){
+        return $this-> db-> get('lucky_money')->result();
+    }
+    function  add(){
+        return $this-> db-> get('lucky_money')->result();
+    }
 }
