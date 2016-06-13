@@ -10,7 +10,6 @@ class Lucky_Money extends CI_Controller {
 		$this->load->model('LuckyMoney');
 		$data['title'] = "红包";
 		$data['all_lucky_money'] = $this->LuckyMoney->find();
-
 		$this->load->view('lucky_money/list', $data);
 	}
     /**
@@ -53,16 +52,23 @@ class Lucky_Money extends CI_Controller {
 
         $total=$lucky_money->total_amount - $lucky_money_package_count_amount;  //余额
         $num=$lucky_money->quantity - $lucky_money_package_count;  //剩余次数
-        $min=0.01;
+        $min=0.5;
+        $max=2;
 
         if ($num>1){
             $safe_total=($total-($num)*$min)/($num);
+            if($safe_total > $max){
+                $safe_total = $max;
+            }
             $money=mt_rand($min*100,$safe_total*100)/100;
             $data['lucky_money_id']= $id;
             $data['amount']= $money;
             $data['uid']=1 ;
             $this->db->insert('lucky_money_package', $data);
         } elseif ($num ==1){
+            if($total > $max){
+                $total = $max;
+            }
             $money=$total;
             $data['lucky_money_id']= $id;
             $data['amount']= $money;
